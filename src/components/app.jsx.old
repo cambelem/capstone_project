@@ -1,0 +1,48 @@
+import React, { Component } from 'react';
+//import { withGoogleMap } from "react-google-maps";
+import { withGoogleMap,
+	GoogleMap,
+	Marker,
+} from "react-google-maps";
+
+import _ from "lodash";
+
+//import Messages from './messages';
+//include our newly installed horizon client
+const Horizon = require('@horizon/client');
+const horizon = Horizon({ secure: false });
+//this initiates our 'messages' collection inside of our Rethinkdb
+//const chat = horizon('messages');
+
+const GettingStartedGoogleMap = withGoogleMap(props => (
+  <GoogleMap
+    ref={props.onMapLoad}
+    defaultZoom={3}
+    defaultCenter={{ lat: -25.363882, lng: 131.044922 }}
+    onClick={props.onMapClick}
+  >
+  </GoogleMap>
+));
+
+class App extends Component {
+	render(){
+	return (
+<div> Hello world  
+  <GettingStartedGoogleMap
+    containerElement={
+      <div style={{ height: `100%` }} />
+    }
+    mapElement={
+      <div style={{ height: `100%` }} />
+    }
+    onMapLoad={_.noop}
+    onMapClick={_.noop}
+    onMarkerRightClick={_.noop}
+  />
+</div>
+
+		);
+	}
+}
+
+export default App;
