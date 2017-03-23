@@ -31,12 +31,32 @@ module.exports = {
         loader: "style-loader!css-loader" 
       },
       { 
-        test: /\.png$/, 
-        loader: "url-loader?limit=100000" 
+        test: /\.(jpg|png)$/, 
+        loader: "file-loader",
+        options: {
+          name: "./images/logo.jpg",
+        },
       },
-      { 
-        test: /\.jpg$/, 
-        loader: "file-loader" 
+//      { 
+  //      test: /\.jpg$/, 
+    //    loader: "url-loader?limit=100000"
+        //loader: "file-loader" 
+     // },
+      {
+        test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/, 
+        loader: 'url?limit=10000&mimetype=application/font-woff'
+      },
+      {
+        test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, 
+        loader: 'url?limit=10000&mimetype=application/octet-stream'
+      },
+      {
+        test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, 
+        loader: 'file'
+      },
+      {
+        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, 
+        loader: 'url?limit=10000&mimetype=image/svg+xml'
       }
       ]
     },
@@ -44,20 +64,20 @@ module.exports = {
         configFile: path.join(__dirname, '.eslintrc.js'),
         useEslintrc: false
     },
-//    plugins: [
-//    new webpack.optimize.UglifyJsPlugin({
-//            compress: {
-//                screw_ie8: true, // React doesn't support IE8 anyway
-//               warnings: true
-//            },
-//            mangle: {
-//                screw_ie8: true
-//            },
-//            output: {
-//                comments: false,
-//                screw_ie8: true
-//            }
-//       })],  
+/*    plugins: [
+    new webpack.optimize.UglifyJsPlugin({
+            compress: {
+               screw_ie8: true, // React doesn't support IE8 anyway
+               warnings: true
+            },
+            mangle: {
+                screw_ie8: true
+            },
+            output: {
+                comments: false,
+                screw_ie8: true
+            }
+       })],*/  
     resolve: {
       extensions: ['', '.js', '.jsx']
     },

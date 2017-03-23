@@ -28,10 +28,13 @@
     "react-twitter-embedded-timeline": "^0.3.3",
     "react-twitter-widgets": "^1.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "file-loader": "^0.10.1",
+    "url-loader": "^0.5.8"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "run": "hz serve --dev & webpack --watch --progress --colors"
+    "run": "rethinkdb --bind all --driver-port 23300 --http-port 46690 & hz serve --dev & webpack --watch --progress --colors"
   },
   "author": "",
   "license": "ISC"

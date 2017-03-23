@@ -4,12 +4,12 @@ import React, { Component } from 'react';
 import Helmet from "react-helmet";
 import { Router, Route, Link, browserHistory } from 'react-router';
 //import TwitterTimeline from 'react-twitter-embedded-timeline';
-import { withGoogleMap, GoogleMap, Marker, HeatmapLayer} from "react-google-maps";
+import { withGoogleMap, GoogleMap, Marker, InfoWindow, HeatmapLayer} from "react-google-maps";
 import NavBar from './navBar';
 
 const Horizon = require('@horizon/client');
 const horizon = Horizon({ secure: false });
-const tweets = horizon('userInfo');
+const tweets = horizon('gpsData');
 
 /*
  * This is the modify version of:
@@ -22,14 +22,28 @@ const GettingStartedGoogleMap = withGoogleMap(props => (
     ref={props.onMapLoad}
     defaultZoom={17}
     defaultCenter={{ lat: 36.214029, lng: -81.678850 }}
-    onClick={props.onMapClick}
+    //onClick={props.onMapClick}
   >
-{console.log(props.markers)}
-    {props.markers.map(marker => (
+    {props.markers.map((marker, index) => (
       <Marker
-        {...marker}
-        onRightClick={() => props.onMarkerRightClick(marker)}
-      />
+        //{...marker}
+        key={index}
+        position={marker.position}
+        //onRightClick={() => props.onMarkerRightClick(marker)}
+        onClick={() => props.onMarkerClick(marker)}
+      >
+        {/*
+          show info window only if the showinfo key of the marker is true.
+          that is when the marker pin has been clicked and oncloseclick has been
+          successfully fired.
+          */
+        }
+        {marker.showInfo && (
+          <InfoWindow onCloseClick={() => props.onMarkerClose(marker)}>
+            <div>{marker.infoContent}</div>
+          </InfoWindow>
+        )}
+      </Marker>
     ))}
     <HeatmapLayer />
   </GoogleMap>
@@ -61,14 +75,18 @@ export default class App extends Component {
     tweets.watch().subscribe(
        (messages) => {
           let t = messages.map(function(message) {
-            console.log(message["created_at"])
+            //console.log(message.coordX)
             //console.log(message["id"])	
             //		this.props.handleMapClick(message);
 
             const nMarkers = {
-              position: { lat: message["newLat"], lng: message["newLong"] },
+                position: { lat: parseFloat(message.coordX), lng: parseFloat(message.coordY) },
                           defaultAnimation: 2,
-                          key: message["id"]
+                          key: message.id,
+                showInfo: false,
+                infoContent:(
+                  <div>TEST</div>
+                ),
               };
 
             //	this.setState({
@@ -76,11 +94,12 @@ export default class App extends Component {
             //	});
 
             //this.setState({test: t});
-            //console.log(message);
+            console.log(nMarkers);
 
               return nMarkers
             });
           this.setState({markers: t});
+          console.log(this.state.markers);
        },
        (err) => {
          console.log(err);
@@ -130,6 +149,41 @@ export default class App extends Component {
     });
   }
   
+  handleMarkerClick = this.handleMarkerClick.bind(this);
+  handleMarkerCLose = this.handleMarkerClose.bind(this);
+
+  // Toggle to true to show InfoWindow and re-renders component
+  handleMarkerClick(targetMarker){
+    this.setState({
+      markers: this.state.markers.map(marker => {
+        if (marker === targetMarker) {
+          return {
+            ...marker,
+            showInfo: true,
+          };
+        }
+        return marker;
+      }),
+    });
+    console.log(this.state.markers);
+  }
+
+  handleMarkerClose(targetMarker) {
+    console.log(this.state.markers);
+    this.setState({
+      markers: this.state.markers.map(marker => {
+        if (marker === targetMarker) {
+          console.log(marker);
+          return {
+            ...marker,
+            showInfo: false,
+          };
+        }
+        return marker;
+      }),
+    });
+  }
+
   render() {
     return (
       <div> 
@@ -143,7 +197,7 @@ export default class App extends Component {
         <div className="row">
           <div className="col-md-6 col-md-offset-1">
             <div style={{height: 100}}>
-            <Helmet title="Getting Started" />
+            <Helmet title="Temp Map" />
             <GettingStartedGoogleMap
               containerElement={
                 <div style={{ height: 100 }} />
@@ -152,9 +206,11 @@ export default class App extends Component {
                 <div style={{ height: 750 , width: 750 }} />
               }
               onMapLoad={this.handleMapLoad}
-              onMapClick={this.handleMapClick}
+              //onMapClick={this.handleMapClick}
               markers={this.state.markers}
-              onMarkerRightClick={this.handleMarkerRightClick}
+              //onMarkerRightClick={this.handleMarkerRightClick}
+              onMarkerClick={this.handleMarkerClick}
+              onMarkerClose={this.handleMarkerClose}
             />
           </div>
         </div>
