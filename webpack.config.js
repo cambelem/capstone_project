@@ -26,29 +26,25 @@ module.exports = {
         test: /\.(js|jsx)$/,
         loader: "eslint",
       },
-      {
+       { 
         test: /\.css$/, 
         loader: "style-loader!css-loader" 
       },
       { 
-        test: /\.(jpg|png)$/, 
-        loader: "file-loader",
-        options: {
-          name: "./images/logo.jpg",
-        },
+        test: /\.png$/, 
+        loader: "url-loader?limit=100000" 
       },
-//      { 
-  //      test: /\.jpg$/, 
-    //    loader: "url-loader?limit=100000"
-        //loader: "file-loader" 
-     // },
+      { 
+        test: /\.jpg$/, 
+        loader: "file-loader" 
+      },
       {
         test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/, 
-        loader: 'url?limit=10000&mimetype=application/font-woff'
+        loader: 'url-loader?limit=10000&mimetype=application/font-woff'
       },
       {
         test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, 
-        loader: 'url?limit=10000&mimetype=application/octet-stream'
+        loader: 'url-loader?limit=10000&mimetype=application/octet-stream'
       },
       {
         test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, 
@@ -56,7 +52,7 @@ module.exports = {
       },
       {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, 
-        loader: 'url?limit=10000&mimetype=image/svg+xml'
+        loader: 'url-loader?limit=10000&mimetype=image/svg+xml'
       }
       ]
     },

@@ -11,6 +11,9 @@ const Horizon = require('@horizon/client');
 const horizon = Horizon({ secure: false });
 const tweets = horizon('gpsData');
 
+//const $ = require('jquery');
+//const moment = require('moment');
+
 /*
  * This is the modify version of:
  * https://developers.google.com/maps/documentation/javascript/examples/event-arguments
@@ -21,10 +24,12 @@ const GettingStartedGoogleMap = withGoogleMap(props => (
   <GoogleMap
     ref={props.onMapLoad}
     defaultZoom={17}
-    defaultCenter={{ lat: 36.214029, lng: -81.678850 }}
+    defaultCenter={props.center}
+    //onMapMounted={this.handleMapMounted}
     //onClick={props.onMapClick}
   >
     {props.markers.map((marker, index) => (
+
       <Marker
         //{...marker}
         key={index}
@@ -32,6 +37,7 @@ const GettingStartedGoogleMap = withGoogleMap(props => (
         //onRightClick={() => props.onMarkerRightClick(marker)}
         onClick={() => props.onMarkerClick(marker)}
       >
+      {console.log(index)}
         {/*
           show info window only if the showinfo key of the marker is true.
           that is when the marker pin has been clicked and oncloseclick has been
@@ -45,7 +51,7 @@ const GettingStartedGoogleMap = withGoogleMap(props => (
         )}
       </Marker>
     ))}
-    <HeatmapLayer />
+    {/*<HeatmapLayer />*/}
   </GoogleMap>
 ));
 
@@ -53,18 +59,19 @@ const GettingStartedGoogleMap = withGoogleMap(props => (
 export default class App extends Component {
 //class Test extends Component {
   state = {
+    center: new google.maps.LatLng(36.214029, -81.678850), 
     markers: []   //[{position: {lat: -25, lng: 131},defaultAnimation:2, key: "NZ"}]
   };
 
   handleMapLoad = this.handleMapLoad.bind(this);
   handleMapClick = this.handleMapClick.bind(this);
   handleMarkerRightClick = this.handleMarkerRightClick.bind(this);
-  purge = this.purge.bind(this);
+
 
   handleMapLoad(map) {
     this._mapComponent = map;
     if (map) {
-      console.log(map.getZoom());
+      //console.log(map.getZoom());
     }
   }
 
@@ -76,40 +83,37 @@ export default class App extends Component {
        (messages) => {
           let t = messages.map(function(message) {
             //console.log(message.coordX)
-            //console.log(message["id"])	
+            //console.log(message)	
             //		this.props.handleMapClick(message);
+            //if (moment().unix()){
+              const nMarkers = {
+                  position: { lat: parseFloat(message.coordX), lng: parseFloat(message.coordY) },
+                            defaultAnimation: 2,
+                            key: message.id,
+                  showInfo: false,
+                  infoContent:(
+                    <div>
+  		                Temperature: {message.temp}
+                      <br />
+  		                Time: {message.time}
+                    </div>
+                  ),
+                };
 
-            const nMarkers = {
-                position: { lat: parseFloat(message.coordX), lng: parseFloat(message.coordY) },
-                          defaultAnimation: 2,
-                          key: message.id,
-                showInfo: false,
-                infoContent:(
-                  <div>TEST</div>
-                ),
-              };
+                return nMarkers
+            //  } else {
+            //    return
+             // }
+          });
 
-            //	this.setState({
-            //	  markers: nMarkers,
-            //	});
-
-            //this.setState({test: t});
-            console.log(nMarkers);
-
-              return nMarkers
-            });
           this.setState({markers: t});
-          console.log(this.state.markers);
+          //console.log(this.state.markers);
        },
        (err) => {
          console.log(err);
        }
     );
   }
-
- purge(){
-   console.log("hi")
- }
 
   /*
    * This is called when you click on the map.
@@ -150,7 +154,7 @@ export default class App extends Component {
   }
   
   handleMarkerClick = this.handleMarkerClick.bind(this);
-  handleMarkerCLose = this.handleMarkerClose.bind(this);
+  handleMarkerClose = this.handleMarkerClose.bind(this);
 
   // Toggle to true to show InfoWindow and re-renders component
   handleMarkerClick(targetMarker){
@@ -165,15 +169,15 @@ export default class App extends Component {
         return marker;
       }),
     });
-    console.log(this.state.markers);
+    //console.log(this.state.markers);
   }
 
   handleMarkerClose(targetMarker) {
-    console.log(this.state.markers);
+    //console.log(this.state.markers);
     this.setState({
       markers: this.state.markers.map(marker => {
         if (marker === targetMarker) {
-          console.log(marker);
+          //console.log(marker);
           return {
             ...marker,
             showInfo: false,
@@ -184,19 +188,48 @@ export default class App extends Component {
     });
   }
 
+  // Unable to work on this till we find a better Weather API
+  /*
+  handleCenterChanged = this.handleCenterChanged.bind(this);
+
+  handleCenterChanged() {
+    const nextCenter = this._mapComponent.getCenter();
+    if (nextCenter !== this.state.center) {      
+      $.ajax({
+      	url: 'http://6d6a7790ea3ac615bcc144d43ff11a17.openweathermap.org/data/2.5/weather?lat='+nextCenter.lat()+'&long='+nextCenter.lng(),
+      	type: 'GET',
+      	dataType: 'json',
+      	success: function(data) {
+      	  console.log(data);
+      	  this.setState({
+                  weatherInfo: data, 
+                  center: {lat: nextCenter.lat(), lng: nextCenter.lng()} 
+                });
+      	}.bind(this),
+      	error: function(xhr, status, err) {
+      	  console.error(this.props.url, status, err.toString());
+      	}.bind(this)
+      });
+    }
+
+    // goes into mapElement below onCenterChanged={this.handleCenterChanged}
+    // goes into app above for GoogleMaps onCenterChanged={props.onCenterChanged}
+  }
+  */
   render() {
+    console.log(this.state.markers);
     return (
       <div> 
         <NavBar />
 
         <div className="row">
-          <div className="col-lg-3 col-md-6">
+          <div className="col-lg-3 col-md-6" style={{height: "75px"}}>
           </div>
         </div>
 
         <div className="row">
-          <div className="col-md-6 col-md-offset-1">
-            <div style={{height: 100}}>
+          <div className="col-md-6 col-md-offset-4">
+            <div style={{height: "100 px"}}>
             <Helmet title="Temp Map" />
             <GettingStartedGoogleMap
               containerElement={
@@ -206,11 +239,13 @@ export default class App extends Component {
                 <div style={{ height: 750 , width: 750 }} />
               }
               onMapLoad={this.handleMapLoad}
+	            center={this.state.center}
               //onMapClick={this.handleMapClick}
               markers={this.state.markers}
               //onMarkerRightClick={this.handleMarkerRightClick}
               onMarkerClick={this.handleMarkerClick}
               onMarkerClose={this.handleMarkerClose}
+              
             />
           </div>
         </div>
