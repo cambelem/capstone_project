@@ -6,7 +6,12 @@ This project uses React, RethinkDB, and Horizon to create a seamless integration
 ## Installation
 Do a git pull of the repository.
 npm install
-Run script "npm run run"
+
+# Scripts
+To run the dev build, type: "npm run devBuild"
+
+To run the website, type: "npm run site"
 
 ## Authors
 - **Eric Cambel**
+- **Walt Scarboro**
